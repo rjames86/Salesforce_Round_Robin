@@ -29,6 +29,7 @@ public with sharing class RoundRobinSettings {
         } else if (record.RR_Number__c > possibleUsersToAssign.size()) {
             // a user has changed since we last incremented. Let's set it to the max it can be
             assigneeNumber = possibleUsersToAssign.size() - 1;
+            record.RR_Number__c = assigneeNumber;
         }
         l.OwnerId = possibleUsersToAssign.get(assigneeNumber).Id;
         incrementRRNumber(record.Name);
