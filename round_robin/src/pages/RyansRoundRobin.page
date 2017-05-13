@@ -1,0 +1,29 @@
+<apex:page showHeader="true" sidebar="true" controller="RyansRoundRobinController" title="Ryans Round Robin">
+    <apex:form id="ConfigurationForm">
+        <apex:pageBlock>
+            <apex:pageMessages id="pgm"/>
+            <apex:pageBlockButtons>
+            <apex:commandButton action="{!save}" value="Save"/>
+            </apex:pageBlockButtons>
+            <apex:pageblockTable value="{!wrapperObject}" var="a" id="out1">
+                <apex:column headerValue="Group Name" >
+                    <apex:inputText id="name" value="{!a.rrSetting.Name}" required="true" />
+                </apex:column>
+                <apex:column headerValue="User Field Name" >
+                    <apex:selectList value="{!a.rrSetting.FieldName__c}" multiselect="false" size="1" >
+                        <apex:selectOptions value="{!UserFieldNames}" />
+                    </apex:selectList>
+                </apex:column>
+                <apex:column headerValue="User Field Value" >
+                    <apex:inputText id="value1" value="{!a.rrSetting.FieldValue__c}" required="true"/>
+                </apex:column>
+                <apex:column >
+                    <apex:commandButton id="cmdAdd" value="+" action="{!addRow}" reRender="out1"/>
+                    <apex:commandButton id="cmdRemove" value="-" action="{!removeRow}" reRender="out1">
+                        <apex:param name="rowIndex" value="{!a.rowNum}" />
+                    </apex:commandButton>
+                </apex:column>
+            </apex:pageblockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

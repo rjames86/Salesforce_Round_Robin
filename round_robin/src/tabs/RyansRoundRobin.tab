@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Ryans Round Robin</label>
+    <mobileReady>false</mobileReady>
+    <motif>Custom83: Pencil</motif>
+    <page>RyansRoundRobin</page>
+    <fullName>RyansRoundRobin</fullName>
+    <description>Configure the round robin settings</description>
+</CustomTab>
