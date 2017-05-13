@@ -47,7 +47,8 @@ public with sharing class RoundRobinSettings {
         String query = 'SELECT Id' +
                 ' FROM User ' +
                 ' WHERE ' + record.FieldName__c +
-                ' = :fieldValue';
+                ' = :fieldValue' +
+                ' ORDER BY CreatedDate';
         return Database.query(query);
     }
 
