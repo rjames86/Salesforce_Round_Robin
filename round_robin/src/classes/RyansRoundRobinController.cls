@@ -34,7 +34,6 @@ public with sharing class RyansRoundRobinController {
 
     public void removeRow() {
         rowNum = Integer.valueOf(ApexPages.currentPage().getParameters().get('rowIndex'));
-        System.debug('got ronum ' + rowNum);
         RyansRoundRobinSettings__c toDelete = wrapperObject.get(rowNum).rrSetting;
         if (null != toDelete.Id) {
             delete toDelete;
@@ -71,7 +70,6 @@ public with sharing class RyansRoundRobinController {
                     addRow();
                 }
             }
-            System.debug(wrapperObject);
             return wrapperObject;
         }
         private set;

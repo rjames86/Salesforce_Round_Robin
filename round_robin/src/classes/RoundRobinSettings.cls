@@ -55,7 +55,6 @@ public with sharing class RoundRobinSettings {
     private void addRRNumberValue(String Name_i, Integer numberToAdd){
         RyansRoundRobinSettings__c record = settings.get(Name_i);
         if (null == record) {
-            System.debug('no record found for ' + Name_i);
             return;
         }
         String fieldValue = record.FieldValue__c;
