@@ -3,7 +3,10 @@ trigger RyansRoundRobinLead on Lead (before insert) {
 
     for (Lead so : Trigger.new) {
         if(Trigger.isInsert) {
-            rrSettings.assignLeadtoUser(so);
+            // TODO custom to Heap's sfdc. Need to generalize
+            if (so.CreatedById == (Id)'0051a000001JeGWAA0'){
+                rrSettings.assignLeadtoUser(so);
+            }
         }
     }
 }

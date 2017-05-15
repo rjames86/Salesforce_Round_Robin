@@ -22,7 +22,7 @@ public with sharing class RyansRoundRobinController {
             String objectFieldLabel = fieldMap.get(fieldName).getDescribe().getLabel();
             Schema.DisplayType fielddataType = fieldMap.get(fieldName).getDescribe().getType();
             if (fielddataType != Schema.DisplayType.Reference) {
-                tempList.add(new SelectOption(objectFieldLabel, fieldName));
+                tempList.add(new SelectOption(fieldName, objectFieldLabel));
             }
         }
         return tempList;
