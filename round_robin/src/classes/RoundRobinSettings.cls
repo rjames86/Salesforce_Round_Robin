@@ -64,10 +64,10 @@ public with sharing class RoundRobinSettings {
                 ' WHERE ' + record.FieldName__c +
                 ' = :fieldValue';
         Integer userCountForRR = Database.countQuery(query);
+        Integer numberForUpdate = Math.mod((Integer)record.RR_Number__c + numberToAdd, userCountForRR);
         if (record.RR_Number__c > userCountForRR) {
             numberForUpdate = 0;
         }
-        Integer numberForUpdate = Math.mod((Integer)record.RR_Number__c + numberToAdd, userCountForRR);
         if (numberForUpdate < 0) {
             numberForUpdate = 0;
         }
