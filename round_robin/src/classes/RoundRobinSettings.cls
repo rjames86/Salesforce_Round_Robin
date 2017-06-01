@@ -1,5 +1,6 @@
 public with sharing class RoundRobinSettings {
     Map<String, RyansRoundRobinSettings__c> settings;
+    RyansRoundRobinSettings__c record;
 
     public RoundRobinSettings() {
         settings = RyansRoundRobinSettings__c.getAll();
@@ -13,25 +14,50 @@ public with sharing class RoundRobinSettings {
         );
     }
 
-    public void assignLeadtoUser(Lead l){
+    public void assignAccountToUser(Account a){
         // I assume we need some kind of criteria to know which group to route to. For now, we'll just route to the first one
-        RyansRoundRobinSettings__c record = settings.values().get(0);
-        List<User> possibleUsersToAssign = getUsersForSetting(record);
+        record = settings.values().get(0);
+        System.debug('settings ' + record);
         Integer assigneeNumber = (Integer)record.RR_Number__c;
 
-        if (possibleUsersToAssign.size() == 0){
+        if (usersForRecord.size() == 0){
             // no one to assign to. let's reset the RR_Number back to 0
             if (assigneeNumber != 0) {
                 record.RR_Number__c = 0;
                 update record;
             }
             return;
-        } else if (record.RR_Number__c > possibleUsersToAssign.size()) {
+        } else if (record.RR_Number__c > usersForRecord.size()) {
+            System.debug('RR Nubmer is larger than usersForRecord');
             // a user has changed since we last incremented. Let's set it to the max it can be
-            assigneeNumber = possibleUsersToAssign.size() - 1;
+            assigneeNumber = usersForRecord.size() - 1;
             record.RR_Number__c = assigneeNumber;
         }
-        l.OwnerId = possibleUsersToAssign.get(assigneeNumber).Id;
+        a.OwnerId = usersForRecord.get(assigneeNumber).Id;
+        update a;
+        incrementRRNumber(record.Name);
+    }
+
+    public void assignLeadtoUser(Lead l){
+        // I assume we need some kind of criteria to know which group to route to. For now, we'll just route to the first one
+        record = settings.values().get(0);
+
+        Integer assigneeNumber = (Integer)record.RR_Number__c;
+
+        if (usersForRecord.size() == 0){
+            // no one to assign to. let's reset the RR_Number back to 0
+            if (assigneeNumber != 0) {
+                record.RR_Number__c = 0;
+                update record;
+            }
+            return;
+        } else if (record.RR_Number__c > usersForRecord.size()) {
+            // a user has changed since we last incremented. Let's set it to the max it can be
+            assigneeNumber = usersForRecord.size() - 1;
+            record.RR_Number__c = assigneeNumber;
+        }
+        l.OwnerId = usersForRecord.get(assigneeNumber).Id;
+        update l;
         incrementRRNumber(record.Name);
     }
 
@@ -43,29 +69,46 @@ public with sharing class RoundRobinSettings {
         addRRNumberValue(Name_i, -1);
     }
 
-    public List<User> getUsersForSetting(RyansRoundRobinSettings__c record){
-        String fieldValue = record.FieldValue__c;
-        String query = 'SELECT Id' +
-                ' FROM User ' +
-                ' WHERE ' + record.FieldName__c +
-                ' = :fieldValue' +
-                ' ORDER BY CreatedDate';
-        return Database.query(query);
+    public List<User> usersForRecord {
+        get {
+            if (null == usersForRecord){
+                String fieldValue = record.FieldValue__c;
+                String query = 'SELECT Id' +
+                        ' FROM User ' +
+                        ' WHERE ' + record.FieldName__c +
+                        ' = :fieldValue' +
+                        ' ORDER BY CreatedDate';
+                usersForRecord = Database.query(query);
+            }
+            return usersForRecord;
+        }
+        set;
+    }
+
+    public Integer userCountForRecord {
+        get {
+            if (null == userCountForRecord) {
+                String fieldValue = record.FieldValue__c;
+                String query = 'SELECT COUNT()' +
+                        ' FROM User ' +
+                        ' WHERE ' + record.FieldName__c +
+                        ' = :fieldValue';
+                userCountForRecord = Database.countQuery(query);
+            }
+            return userCountForRecord;
+        }
+        set;
     }
 
     private void addRRNumberValue(String Name_i, Integer numberToAdd){
-        RyansRoundRobinSettings__c record = settings.get(Name_i);
         if (null == record) {
             return;
         }
-        String fieldValue = record.FieldValue__c;
-        String query = 'SELECT COUNT()' +
-                ' FROM User ' +
-                ' WHERE ' + record.FieldName__c +
-                ' = :fieldValue';
-        Integer userCountForRR = Database.countQuery(query);
-        Integer numberForUpdate = Math.mod((Integer)record.RR_Number__c + numberToAdd, userCountForRR);
-        if (record.RR_Number__c > userCountForRR) {
+        System.debug('record ' + record);
+
+        System.debug('userCountForRecord ' + userCountForRecord);
+        Integer numberForUpdate = Math.mod((Integer)record.RR_Number__c + numberToAdd, userCountForRecord);
+        if (record.RR_Number__c > userCountForRecord) {
             numberForUpdate = 0;
         }
         if (numberForUpdate < 0) {
