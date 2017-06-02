@@ -60,6 +60,7 @@ public with sharing class RoundRobinSettings {
         }
         Integer numberForUpdate = Math.mod((Integer)setting.RR_Number__c + numberToAdd, userCountForRecord);
         if (setting.RR_Number__c > userCountForRecord) {
+            // Is this the right thing to do here? This might skip someone who should be next
             numberForUpdate = 0;
         }
         if (numberForUpdate < 0) {
